@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カワイイ円形ボタンの電卓</title>
+    <style>
+        body {
+            font-family: 'Pacifico', cursive;
+            background-color: #ffe6f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #calculator {
+            background-color: #ffccf2;
+            padding: 40px;
+            border-radius: 40px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+        #display {
+            width: 100%;
+            height: 50px;
+            font-size: 30px;
+            margin-bottom: 10px;
+            text-align: right;
+            padding-right: 10px;
+            border: none;
+            border-radius: 30px;
+            background-color: #ffe6f9;
+            color: #ff3399;
+        }
+        .button {
+            width: 50px;
+            height: 50px;
+            font-size: 30px;
+            margin: 5px;
+            border: none;
+            border-radius: 50%;
+            background-color: #ff99cc;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease, background-color 0.1s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .button:focus {
+            outline: none;
+        }
+        .button:active {
+            background-color: #ff4da6;
+            transform: translateY(2px);
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <input type="text" id="display" disabled>
+        <br>
+        <button class="button">1</button>
+        <button class="button">2</button>
+        <button class="button">3</button>
+        <button class="button">+</button>
+        <br>
+        <button class="button">4</button>
+        <button class="button">5</button>
+        <button class="button">6</button>
+        <button class="button">-</button>
+        <br>
+        <button class="button">7</button>
+        <button class="button">8</button>
+        <button class="button">9</button>
+        <button class="button">*</button>
+        <br>
+        <button class="button">0</button>
+        <button class="button">.</button>
+        <button class="button">=</button>
+        <button class="button">/</button>
+        <br>
+        <button class="button">C</button>
+        <button class="button">AC</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const display = document.getElementById("display");
+            const buttons = document.querySelectorAll(".button");
+            let currentInput = "";
+            let operator = null;
+            let previousInput = "";
+
+            buttons.forEach(button => {
+                button.addEventListener("click", function() {
+                    const value = this.textContent;
+
+                    if (value === "C") {
+                        // 現在の入力をクリア
+                        currentInput = "";
+                        display.value = "";
+                    } else if (value === "AC") {
+                        // 全クリア
+                        currentInput = "";
+                        operator = null;
+                        previousInput = "";
+                        display.value = "";
+                    } else if (value === "=") {
+                        if (operator && previousInput !== "") {
+                            currentInput = calculate(parseFloat(previousInput), parseFloat(currentInput), operator);
+                            display.value = currentInput;
+                            operator = null;
+                            previousInput = "";
+                        }
+                    } else if (["+", "-", "*", "/"].includes(value)) {
+                        if (currentInput !== "") {
+                            operator = value;
+                            previousInput = currentInput;
+                            currentInput = "";
+                        }
+                    } else if (value === ".") {
+                        if (!currentInput.includes(".")) {
+                            currentInput += value;
+                            display.value = currentInput;
+                        }
+                    } else {
+                        currentInput += value;
+                        display.value = currentInput;
+                    }
+                });
+            });
+
+            function calculate(num1, num2, operator) {
+                switch (operator) {
+                    case "+":
+                        return num1 + num2;
+                    case "-":
+                        return num1 - num2;
+                    case "*":
+                        return num1 * num2;
+                    case "/":
+                        return num1 / num2;
+                    default:
+                        return num2;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
