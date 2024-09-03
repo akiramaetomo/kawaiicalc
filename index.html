@@ -1,12 +1,12 @@
-#Kawaii Calc ver 0.9 akiramaetomo 24-0904 abc
+#Kawaii Calc ver 1.0b akiramaetomo 24-0904 abc
 
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAWAII CALC Ver0.9</title>
+    <title>KAWAII CALC Ver1.0b</title>
     <style>
-        body {            
+        body {
             font-family: 'Pacifico', cursive;
             background-color: #ffe6f2;
             display: flex;
@@ -76,7 +76,7 @@
         <button class="button">7</button>
         <button class="button">8</button>
         <button class="button">9</button>
-        <button class="button">X</button>
+        <button class="button">*</button>
         <br>
         <button class="button">0</button>
         <button class="button">.</button>
@@ -101,11 +101,12 @@
                     const value = this.textContent;
 
                     if (value === "C") {
+                        // "C"キー: 現在入力中の数値のみをクリア
                         currentInput = "";
                         display.value = "";
-                        expression = [];
                         lastInputType = "number";
                     } else if (value === "AC") {
+                        // "AC"キー: 全てをクリア
                         currentInput = "";
                         expression = [];
                         display.value = "";
@@ -119,7 +120,7 @@
                         expression = [];
                         currentInput = result.toString();
                         lastInputType = "number";
-                    } else if (["+", "-", "X", "/"].includes(value)) {
+                    } else if (["+", "-", "*", "/"].includes(value)) {
                         if (lastInputType === "operator") {
                             expression.pop(); // 連続した演算子を無視するために、前の演算子を削除
                         } else if (currentInput !== "") {
@@ -158,14 +159,14 @@
                 const precedence = {
                     "+": 1,
                     "-": 1,
-                    "X": 2,
+                    "*": 2,
                     "/": 2
                 };
 
                 expression.forEach(token => {
                     if (!isNaN(token)) {
                         outputQueue.push(token);
-                    } else if (["+", "-", "X", "/"].includes(token)) {
+                    } else if (["+", "-", "*", "/"].includes(token)) {
                         while (operatorStack.length > 0 &&
                             precedence[operatorStack[operatorStack.length - 1]] >= precedence[token]) {
                             outputQueue.push(operatorStack.pop());
@@ -183,7 +184,7 @@
                 outputQueue.forEach(token => {
                     if (!isNaN(token)) {
                         calculationStack.push(parseFloat(token));
-                    } else if (["+", "-", "X", "/"].includes(token)) {
+                    } else if (["+", "-", "*", "/"].includes(token)) {
                         const b = calculationStack.pop();
                         const a = calculationStack.pop();
                         calculationStack.push(calculate(a, b, token));
@@ -199,7 +200,7 @@
                         return num1 + num2;
                     case "-":
                         return num1 - num2;
-                    case "X":
+                    case "*":
                         return num1 * num2;
                     case "/":
                         return num1 / num2;
