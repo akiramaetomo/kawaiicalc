@@ -1,11 +1,12 @@
+#Kawaii Calc ver 0.9 akiramaetomo 24-0904 abc
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>カワイイ円形ボタンの電卓</title>
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAWAII CALC Ver0.9</title>
     <style>
-        body {
+        body {            
             font-family: 'Pacifico', cursive;
             background-color: #ffe6f2;
             display: flex;
@@ -75,13 +76,14 @@
         <button class="button">7</button>
         <button class="button">8</button>
         <button class="button">9</button>
-        <button class="button">*</button>
+        <button class="button">X</button>
         <br>
         <button class="button">0</button>
         <button class="button">.</button>
         <button class="button">=</button>
         <button class="button">/</button>
         <br>
+        <button class="button">±</button>
         <button class="button">C</button>
         <button class="button">AC</button>
     </div>
@@ -91,47 +93,105 @@
             const display = document.getElementById("display");
             const buttons = document.querySelectorAll(".button");
             let currentInput = "";
-            let operator = null;
-            let previousInput = "";
+            let expression = [];
+            let lastInputType = "number"; // 入力の種類を記録する
 
             buttons.forEach(button => {
                 button.addEventListener("click", function() {
                     const value = this.textContent;
 
                     if (value === "C") {
-                        // 現在の入力をクリア
                         currentInput = "";
                         display.value = "";
+                        expression = [];
+                        lastInputType = "number";
                     } else if (value === "AC") {
-                        // 全クリア
                         currentInput = "";
-                        operator = null;
-                        previousInput = "";
+                        expression = [];
                         display.value = "";
+                        lastInputType = "number";
                     } else if (value === "=") {
-                        if (operator && previousInput !== "") {
-                            currentInput = calculate(parseFloat(previousInput), parseFloat(currentInput), operator);
-                            display.value = currentInput;
-                            operator = null;
-                            previousInput = "";
-                        }
-                    } else if (["+", "-", "*", "/"].includes(value)) {
                         if (currentInput !== "") {
-                            operator = value;
-                            previousInput = currentInput;
-                            currentInput = "";
+                            expression.push(currentInput);
+                        }
+                        const result = evaluateExpression(expression);
+                        display.value = result;
+                        expression = [];
+                        currentInput = result.toString();
+                        lastInputType = "number";
+                    } else if (["+", "-", "X", "/"].includes(value)) {
+                        if (lastInputType === "operator") {
+                            expression.pop(); // 連続した演算子を無視するために、前の演算子を削除
+                        } else if (currentInput !== "") {
+                            expression.push(currentInput);
+                        }
+                        expression.push(value);
+                        currentInput = "";
+                        lastInputType = "operator";
+                    } else if (value === "±") {
+                        if (currentInput !== "") {
+                            if (currentInput.startsWith("-")) {
+                                currentInput = currentInput.substring(1);
+                            } else {
+                                currentInput = "-" + currentInput;
+                            }
+                            display.value = currentInput;
                         }
                     } else if (value === ".") {
                         if (!currentInput.includes(".")) {
                             currentInput += value;
                             display.value = currentInput;
+                            lastInputType = "number";
                         }
                     } else {
                         currentInput += value;
                         display.value = currentInput;
+                        lastInputType = "number";
                     }
                 });
             });
+
+            function evaluateExpression(expression) {
+                const outputQueue = [];
+                const operatorStack = [];
+
+                const precedence = {
+                    "+": 1,
+                    "-": 1,
+                    "X": 2,
+                    "/": 2
+                };
+
+                expression.forEach(token => {
+                    if (!isNaN(token)) {
+                        outputQueue.push(token);
+                    } else if (["+", "-", "X", "/"].includes(token)) {
+                        while (operatorStack.length > 0 &&
+                            precedence[operatorStack[operatorStack.length - 1]] >= precedence[token]) {
+                            outputQueue.push(operatorStack.pop());
+                        }
+                        operatorStack.push(token);
+                    }
+                });
+
+                while (operatorStack.length > 0) {
+                    outputQueue.push(operatorStack.pop());
+                }
+
+                const calculationStack = [];
+
+                outputQueue.forEach(token => {
+                    if (!isNaN(token)) {
+                        calculationStack.push(parseFloat(token));
+                    } else if (["+", "-", "X", "/"].includes(token)) {
+                        const b = calculationStack.pop();
+                        const a = calculationStack.pop();
+                        calculationStack.push(calculate(a, b, token));
+                    }
+                });
+
+                return calculationStack.pop();
+            }
 
             function calculate(num1, num2, operator) {
                 switch (operator) {
@@ -139,7 +199,7 @@
                         return num1 + num2;
                     case "-":
                         return num1 - num2;
-                    case "*":
+                    case "X":
                         return num1 * num2;
                     case "/":
                         return num1 / num2;
