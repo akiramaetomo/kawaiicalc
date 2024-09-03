@@ -1,4 +1,4 @@
-<!-- Kawaii Calc ver 1.0final beta akiramaetomo 24-0904 abc -->
+<!-- Kawaii Calc ver 1.0final beta2 akiramaetomo 24-0904 abc -->
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -20,19 +20,21 @@
             padding: 40px;
             border-radius: 40px;
             box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
-            width: 400px;
+            width: 270px;
         }
         #display {
-            width: 100%;
+            width: calc(100%); /* 左右の余白分を引いた幅に設定 */
             height: 50px;
             font-size: 30px;
             margin-bottom: 10px;
             text-align: right;
             padding-right: 10px;
+            padding-left: 10px; /* 左側の余白も追加 */
             border: none;
             border-radius: 30px;
             background-color: #ffe6f9;
             color: #ff3399;
+            box-sizing: border-box; /* パディングを含めて幅を計算 */
         }
         .button {
             width: 50px;
